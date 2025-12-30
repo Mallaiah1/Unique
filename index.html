@@ -2,23 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Number Todo – Left Aligned</title>
+  <title>Number Todo App</title>
 
-  <!-- Bootstrap CDN -->
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
+    /* ===== THEME COLORS ===== */
+    :root {
+      --green-main: #198754;
+      --green-dark: #146c43;
+      --green-light: #d1e7dd;
+    }
+
+    /* ===== NAVBAR STYLING ===== */
+    .navbar-custom {
+      background: linear-gradient(135deg, var(--green-main), var(--green-dark));
+    }
+
+    .navbar-brand {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-link {
+      position: relative;
+      margin-right: 10px;
+      font-weight: 500;
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 2px;
+      left: 0;
+      bottom: 0;
+      background-color: var(--green-light);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    .counter-badge {
+      background-color: var(--green-light);
+      color: var(--green-dark);
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 50px;
+    }
+
+    .theme-toggle {
+      background-color: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.1rem;
+    }
+
+    .theme-toggle:hover {
+      background-color: rgba(255,255,255,0.25);
+    }
+
+    /* ===== NUMBER BUTTONS ===== */
     .number-btn {
       min-width: 70px;
       font-size: 1rem;
+      background-color: var(--green-main);
+      border: none;
+      color: white;
+      animation: addAnim 0.3s ease;
+    }
+
+    .number-btn:hover {
+      background-color: var(--green-dark);
+    }
+
+    @keyframes addAnim {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* ===== DARK MODE ===== */
+    body.dark-mode {
+      background-color: #0f1f17 !important;
+      color: #e6f4ea;
+    }
+
+    body.dark-mode .card {
+      background-color: #152a1f;
+      color: #e6f4ea;
+    }
+
+    body.dark-mode .navbar {
+      background-color: var(--green-dark) !important;
+    }
+
+    body.dark-mode .form-control {
+      background-color: #1f3b2c;
+      color: #fff;
+      border-color: #2e6f4e;
+    }
+
+    body.dark-mode .form-control::placeholder {
+      color: #b7dbc8;
+    }
+
+    /* ===== REMOVE BUTTON FOCUS ===== */
+    button:focus,
+    .btn:focus {
+      box-shadow: none !important;
+      outline: none !important;
     }
   </style>
 </head>
 <body class="bg-light">
 
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">🌿 Number Todo</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <!-- NAV ITEMS -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Todo</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Stats</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Help</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+      </ul>
+
+      <!-- RIGHT SIDE -->
+      <div class="d-flex align-items-center gap-3">
+        <span class="counter-badge" id="countBadge">0</span>
+        <button class="theme-toggle text-white" id="themeToggle">🌙</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== TODO CONTENT ===== -->
 <div class="container py-4">
   <div class="row justify-content-center">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+    <div class="col-12 col-md-8 col-lg-6">
 
       <div class="card shadow-sm">
         <div class="card-header text-center fw-bold">
@@ -27,8 +168,8 @@
 
         <div class="card-body">
 
-          <!-- Input + Clear -->
-          <div class="input-group mb-3">
+          <!-- Input + Reset -->
+          <div class="d-flex gap-2 mb-3">
             <input
               type="text"
               id="numberInput"
@@ -36,18 +177,15 @@
               placeholder="Enter number & press Enter">
 
             <button
-              class="btn btn-danger"
+              class="btn btn-success px-4"
               id="clearAllBtn"
               type="button">
-              Clear
+              Reset
             </button>
           </div>
 
-          <!-- LEFT ALIGNED buttons -->
-          <div
-            id="buttonContainer"
-            class="d-flex flex-wrap align-items-start gap-2">
-          </div>
+          <!-- Number buttons container -->
+          <div id="buttonContainer" class="d-flex flex-wrap gap-2"></div>
 
         </div>
 
@@ -60,47 +198,73 @@
   </div>
 </div>
 
+<!-- ===== Bootstrap JS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
   const input = document.getElementById("numberInput");
   const container = document.getElementById("buttonContainer");
   const clearBtn = document.getElementById("clearAllBtn");
+  const toggleBtn = document.getElementById("themeToggle");
+  const badge = document.getElementById("countBadge");
   const numbersSet = new Set();
+
+  // Load saved theme
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-mode");
+    toggleBtn.textContent = "☀️";
+  }
+
+  // Toggle theme
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    const dark = document.body.classList.contains("dark-mode");
+    toggleBtn.textContent = dark ? "☀️" : "🌙";
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  });
+
+  function updateCount() {
+    badge.textContent = numbersSet.size;
+  }
 
   // Allow only numbers
   input.addEventListener("input", () => {
     input.value = input.value.replace(/[^0-9]/g, "");
   });
 
-  // Add on Enter
+  // Add number on Enter
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && input.value !== "") {
       const value = input.value;
-
       if (!numbersSet.has(value)) {
         numbersSet.add(value);
 
         const btn = document.createElement("button");
-        btn.className = "btn btn-primary number-btn";
+        btn.className = "btn number-btn";
         btn.textContent = value;
 
+        // Remove number with animation
         btn.addEventListener("click", () => {
           numbersSet.delete(value);
-          btn.remove();
+          btn.style.opacity = "0";
+          btn.style.transform = "scale(0.8)";
+          setTimeout(() => btn.remove(), 200);
+          updateCount();
         });
 
         container.appendChild(btn);
+        updateCount();
       }
-
       input.value = "";
     }
   });
 
-  // Clear all
+  // Reset all
   clearBtn.addEventListener("click", () => {
     numbersSet.clear();
     container.innerHTML = "";
+    updateCount();
     input.value = "";
-    input.focus();
   });
 </script>
 
