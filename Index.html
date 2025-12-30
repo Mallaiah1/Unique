@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Number Todo – Left Aligned</title>
+
+  <!-- Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .number-btn {
+      min-width: 70px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+
+      <div class="card shadow-sm">
+        <div class="card-header text-center fw-bold">
+          Number Todo List
+        </div>
+
+        <div class="card-body">
+
+          <!-- Input + Clear -->
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              id="numberInput"
+              class="form-control form-control-lg"
+              placeholder="Enter number & press Enter">
+
+            <button
+              class="btn btn-danger"
+              id="clearAllBtn"
+              type="button">
+              Clear
+            </button>
+          </div>
+
+          <!-- LEFT ALIGNED buttons -->
+          <div
+            id="buttonContainer"
+            class="d-flex flex-wrap align-items-start gap-2">
+          </div>
+
+        </div>
+
+        <div class="card-footer text-muted small">
+          Click a number to delete
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const input = document.getElementById("numberInput");
+  const container = document.getElementById("buttonContainer");
+  const clearBtn = document.getElementById("clearAllBtn");
+  const numbersSet = new Set();
+
+  // Allow only numbers
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/[^0-9]/g, "");
+  });
+
+  // Add on Enter
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && input.value !== "") {
+      const value = input.value;
+
+      if (!numbersSet.has(value)) {
+        numbersSet.add(value);
+
+        const btn = document.createElement("button");
+        btn.className = "btn btn-primary number-btn";
+        btn.textContent = value;
+
+        btn.addEventListener("click", () => {
+          numbersSet.delete(value);
+          btn.remove();
+        });
+
+        container.appendChild(btn);
+      }
+
+      input.value = "";
+    }
+  });
+
+  // Clear all
+  clearBtn.addEventListener("click", () => {
+    numbersSet.clear();
+    container.innerHTML = "";
+    input.value = "";
+    input.focus();
+  });
+</script>
+
+</body>
+</html>
